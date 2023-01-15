@@ -23,18 +23,29 @@ contract EscrowTest is Test {
         mockERC721.mint(RECIPIENT, 0);
 
         // Approve escrow to transfer NFT
+        vm.startPrank(RECIPIENT);
         mockERC721.approve(address(escrow), 0);
 
         // Deposit NFT into escrow
         escrow.depositNFT(address(mockERC721), 0);
 
-        address ownerNFT = mockERC721.ownerOf(0);
-
-        assertEq(ownerNFT, address(escrow));
+        assertEq(mockERC721.ownerOf(0), address(escrow));
     }
 
-    // function testWithdrawl(uint256 x) public {
-    //     counter.setNumber(x);
-    //     assertEq(counter.number(), x);
-    // }
+    function testWithdrawl() public {
+        // Mint NFT for RECIPIENT
+        mockERC721.mint(RECIPIENT, 0);
+
+        // Approve escrow to transfer NFT
+        vm.startPrank(RECIPIENT);
+        mockERC721.approve(address(escrow), 0);
+
+        // Deposit NFT into escrow
+        escrow.depositNFT(address(mockERC721), 0);
+
+        // Withdrawl NFT from escrow
+        escrow.withdrawlNFT(address(mockERC721), 0);
+
+        assertEq(mockERC721.ownerOf(0), RECIPIENT);
+    }
 }
