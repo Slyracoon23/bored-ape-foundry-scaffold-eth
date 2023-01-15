@@ -39,3 +39,6 @@ yarn-error.log*
 
 # database
 .database.json
+
+# foundry contracts
+bored-ape-contacts/myreadme.md
