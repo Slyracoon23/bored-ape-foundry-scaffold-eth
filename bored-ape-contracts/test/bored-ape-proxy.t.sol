@@ -48,4 +48,44 @@ contract EscrowTest is Test {
 
         assertEq(mockERC721.ownerOf(0), RECIPIENT);
     }
+
+    function testApprovedNFTsListByOwner() public {
+        // Mint NFT for RECIPIENT
+        mockERC721.mint(RECIPIENT, 0);
+        mockERC721.mint(RECIPIENT, 1);
+
+        // Approve escrow to transfer NFT
+        vm.startPrank(RECIPIENT);
+        mockERC721.setApprovalForAll(address(escrow), true);
+
+        uint256[] memory approvedNFT_tokenId_list = escrow
+            .getApprovedNFTsByOwner(address(mockERC721), RECIPIENT);
+
+        assertEq(approvedNFT_tokenId_list.length, 2);
+
+        assertEq(mockERC721.ownerOf(approvedNFT_tokenId_list[0]), RECIPIENT);
+        assertEq(mockERC721.ownerOf(approvedNFT_tokenId_list[1]), RECIPIENT);
+    }
+
+    function testAddApprovedHolder() public {
+        // Mint NFT for RECIPIENT
+        mockERC721.mint(RECIPIENT, 0);
+
+        // Approve escrow to transfer NFT
+        vm.startPrank(RECIPIENT);
+        mockERC721.setApprovalForAll(address(escrow), true);
+
+        escrow.addApprovedHolder(address(mockERC721), RECIPIENT);
+
+        assertEq(escrow.nftApprovedHolders(0), RECIPIENT);
+    }
+
+    function testApprovedAll() public {
+        // Mint NFT for RECIPIENT
+        mockERC721.mint(RECIPIENT, 0);
+
+        // Approve escrow to transfer NFT
+        vm.startPrank(RECIPIENT);
+        mockERC721.setApprovalForAll(address(escrow), true);
+    }
 }
