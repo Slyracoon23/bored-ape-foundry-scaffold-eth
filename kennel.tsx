@@ -11,7 +11,6 @@ import Head from "next/head";
 import { useState } from "react";
 import React from 'react'
 import {useRouter} from 'next/router'
-import { TemplateCard } from "components/card";
 
 
 
@@ -21,10 +20,11 @@ const Kennel: NextPage = () => {
   const [activeContract, setActiveContract] = useState<Address>(AddressZero);
   const { state: isWalletOpen, toggle: toggleWallet } = useToggle(false);
   const walletButtonText = isWalletOpen ? "close wallet" : "open wallet";
-  const contract_address = ["0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D"]
+  const contract_address = ["0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D", "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"]
   //console.log(contract_address)
   //const [data, setData] = useState([]);
-  const [kcData, setKcData] = useState([]);
+  const [baycData, setBaycData] = useState([]);
+  const [maycData, setMaycData] = useState([]);
   const [userSelectData, setUserSelectData] = useState([]);
   const resetActiveContract = () => setActiveContract(AddressZero);
   //console.log(props)
@@ -33,7 +33,7 @@ const Kennel: NextPage = () => {
     
     // let url = `https://api.nftport.xyz/v0/accounts/${walletId}?chain=ethereum&include=metadata`
     let url = `https://api.nftport.xyz/v0/accounts/${walletId}?chain=ethereum&include=metadata&contract_address=${contract_address[0]}`
-    // let url2 = `https://api.nftport.xyz/v0/accounts/${walletId}?chain=ethereum&include=metadata&contract_address=${contract_address[1]}`
+    let url2 = `https://api.nftport.xyz/v0/accounts/${walletId}?chain=ethereum&include=metadata&contract_address=${contract_address[1]}`
     fetch(url, {
       method: "GET",
       headers: {
@@ -42,19 +42,19 @@ const Kennel: NextPage = () => {
       }
     })
       .then(response => response.json())
-      .then(result => setKcData(result.nfts || []))
-    // setTimeout(() =>{
-    //   fetch(url2, {
-    //     method: "GET",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       "Authorization": apiKey
-    //     }
-    //   })
-    //     .then(response => response.json())
-    //     .then(result => setMaycData(result.nfts || []))
+      .then(result => setBaycData(result.nfts || []))
+    setTimeout(() =>{
+      fetch(url2, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        }
+      })
+        .then(response => response.json())
+        .then(result => setMaycData(result.nfts || []))
 
-    // }, 2000)
+    }, 2000)
       
       
     
@@ -62,41 +62,58 @@ const Kennel: NextPage = () => {
   }, [])
 
   
-  const handleClickedData = (title, tokenid, selectBool) =>{
-    if (selectBool){
-      const item = {tokenName: title, tokenId: tokenid}
-      setUserSelectData((prevArr) => ([...prevArr, item]))
-    }else{
-      for(let i = 0; i<userSelectData.length; i++){
-        if(userSelectData[i].tokenName == title && userSelectData[i].tokenId == tokenid){
-          let newArr = [...userSelectData]
-          // setUserSelectData(newArr)
-          newArr.splice(i, 1)
-          setUserSelectData(newArr)
-          //console.log(userSelectData)
+  
 
-          
-        }
-      }
-      
-
-      }
-    }
-
-  const items = kcData.map((item, i) => {
+  const items = baycData.map((item, i) => {
     
-    if (kcData.length != 0){
+    if (baycData.length != 0){
       return (
-        <TemplateCard onClick={handleClickedData} title={`KC`} description={item['description']} tokenid={item['token_id']} img={item['cached_file_url']} key={i}/>
+        <div className="mx-2 my-3" onClick={()=>setUserSelectData(oldArray => [...oldArray, item])}>
+          <div className="card ">
+            <img src={item['cached_file_url']} alt="NFT image" />
+  
+            <div className="card-body">
+              <p className="card-text">
+                {item['name']}
+              </p>
+              <div className="justify-content-between align-items-center">
+                <small>${item['description']}</small>
+              </div>
+            </div>
+          </div>
+        </div>
   
       );
       }
 
   })
+  const items2 = maycData.map((item, i) => {
+    
+    if (maycData.length != 0){
+      return (
+        <div className="mx-2 my-3" onClick={()=>setUserSelectData(oldArray => [...oldArray, item])}>
+          <div className="card ">
+            <img src={item['cached_file_url']} alt="NFT image" />
   
+            <div className="card-body">
+              <p className="card-text">
+                {item['name']}
+              </p>
+              <div className="justify-content-between align-items-center">
+                <small>${item['description']}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      );
+      }
+
+  })
   //console.log(items)
   console.log(userSelectData)
-  console.log(kcData)
+  console.log(baycData)
+  console.log(maycData)
   // console.log(items)
   console.log(userSelectData)
 
@@ -120,6 +137,7 @@ const Kennel: NextPage = () => {
         <h2 className="font-bold text-center">Select Your Kennel</h2>
         <div id="result_nfts" className="flex flex-row flex-wrap">
           {items}
+          {items2}
           </div>
           <button  className="btn border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none">Submit</button>
         </section>

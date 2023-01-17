@@ -28,3 +28,11 @@ body {
 .btn{
   width: 100px
 }
+
+.hidden{
+  display: none
+}
+
+.card-selected{
+  background-color: aquamarine;
+}
