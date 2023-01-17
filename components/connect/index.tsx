@@ -35,9 +35,9 @@ export const Connect = () => {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="border border-black dark:border-white px-2 py-0.5 focus:italic focus:outline-none"
+                    className="connect-wallet-btn"
                   >
-                    connect wallet
+                    Connect Wallet
                   </button>
                 );
               }
