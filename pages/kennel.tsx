@@ -73,7 +73,7 @@ const Kennel: NextPage = () => {
   return (
     <section className="text-black dark:text-white dark:bg-black min-h-screen max-h-screen flex flex-col overflow-hidden selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Head>
-        <title>Blacksmith</title>
+        <title>ApeMatcher</title>
         <link rel="icon" href="/favicon.ico" />
         <meta
           name="description"
