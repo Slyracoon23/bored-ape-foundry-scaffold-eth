@@ -51,3 +51,22 @@ body {
     justify-content: center;
 
 }
+
+.connect-wallet-btn {
+
+  border:solid;
+  border-radius: 15px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.my-3{
+
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  
+}
