@@ -106,3 +106,9 @@ body {
   flex-wrap: wrap;
   
 }
+
+#display-center{
+
+  display: flex;
+  align-items: center;
+}
