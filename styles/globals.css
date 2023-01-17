@@ -45,6 +45,22 @@ body {
   width: 100px
 }
 
+.hidden{
+  display: none
+}
+
+.card-selected{
+  background-color: aquamarine;
+}
+
+.hidden{
+  display: none
+}
+
+.card-selected{
+  background-color: aquamarine;
+}
+
 .flex-wrap {
 
     display: flex;

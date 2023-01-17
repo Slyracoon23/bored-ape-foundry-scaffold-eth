@@ -11,7 +11,7 @@ import Head from "next/head";
 import { useState } from "react";
 import React from 'react'
 import { useRouter } from 'next/router'
-import { TemplateCard } from "components/card";
+
 
 
 
@@ -33,7 +33,6 @@ const Apes: NextPage = () => {
   //const [modUserSelectArray, setModUserSelectArray] = useState(userSelectData)
   // Added handler
   const handleClick = () => {
-    console.log()
     setSelected(!selected);
   };
   //console.log(props)
@@ -69,40 +68,26 @@ const Apes: NextPage = () => {
     
     
   }, [])
-
-  
-  const handleClickedData = (title, tokenid, selectBool) =>{
-    if (selectBool){
-      const item = {tokenName: title, tokenId: tokenid}
-      setUserSelectData((prevArr) => ([...prevArr, item]))
-    }else{
-      for(let i = 0; i<userSelectData.length; i++){
-        if(userSelectData[i].tokenName == title && userSelectData[i].tokenId == tokenid){
-          let newArr = [...userSelectData]
-          // setUserSelectData(newArr)
-          newArr.splice(i, 1)
-          setUserSelectData(newArr)
-          //console.log(userSelectData)
-
-          
-        }
-      }
-      
-
-      }
-    }
-
-
-    
   
 
   const items = baycData.map((item, i) => {
     
-    
     if (baycData.length != 0){
       return (
-        <TemplateCard onClick={handleClickedData} title={`BAYC`} description={item['description']} tokenid={item['token_id']} img={item['cached_file_url']} key={i}/>
-       
+        <div className="mx-2 my-3" onClick={()=>setUserSelectData(oldArray => [...oldArray, item])}>
+          <div className="card ">
+            <img src={item['cached_file_url']} alt="NFT image" />
+  
+            <div className="card-body">
+              <p className="card-text">
+                {item['name']}
+              </p>
+              <div className="justify-content-between align-items-center">
+                <small>${item['description']}</small>
+              </div>
+            </div>
+          </div>
+        </div>
   
       );
       }
@@ -112,7 +97,20 @@ const Apes: NextPage = () => {
     
     if (maycData.length != 0){
       return (
-        <TemplateCard onClick={handleClickedData} title={`MAYC`} description={item['description']} tokenid={item['token_id']} img={item['cached_file_url']} key={i}/>
+        <div className="mx-2 my-3" onClick={()=>setUserSelectData(oldArray => [...oldArray, item])}>
+          <div className="card ">
+            <img src={item['cached_file_url']} alt="NFT image" />
+  
+            <div className="card-body">
+              <p className="card-text">
+                {item['name']}
+              </p>
+              <div className="justify-content-between align-items-center">
+                <small>${item['description']}</small>
+              </div>
+            </div>
+          </div>
+        </div>
   
       );
       }
@@ -120,14 +118,14 @@ const Apes: NextPage = () => {
   })
   //console.log(items)
   console.log(userSelectData)
-  // console.log(baycData)
-  // console.log(maycData)
+  console.log(baycData)
+  console.log(maycData)
 
 
   return (
     <section className="text-black dark:text-white dark:bg-black min-h-screen max-h-screen flex flex-col overflow-hidden selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Head>
-        <title>ApeMatcher</title>
+        <title>Blacksmith</title>
         <link rel="icon" href="/favicon.ico" />
         <meta
           name="description"
