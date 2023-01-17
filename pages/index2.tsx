@@ -39,9 +39,11 @@ const Home: NextPage = () => {
           <h2 className="font-bold ">Select Which Contract</h2>
           <div className="my-3">
             
+          <div className="mx-2 my-3">
+          <div className="selection-card ">
             {/* <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href="/apes">Apes
             </Link> */}
-            <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
+            <Link className="dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
               pathname:"/apes", 
               query: {
                 walletId: "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"
@@ -49,9 +51,14 @@ const Home: NextPage = () => {
               }}>
                 Apes
             </Link>
+            </div>
+            </div>
+
+            <div className="mx-2 my-3">
+          <div className="selection-card">
             {/* <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href="/kennel">Kennel Club
             </Link> */}
-            <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
+            <Link className="dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
               pathname:"/kennel", 
               query: {
                 walletId: "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"
@@ -59,6 +66,8 @@ const Home: NextPage = () => {
               }}>
                 Kennel Club
             </Link>
+            </div>
+            </div>
 
           </div>
           
