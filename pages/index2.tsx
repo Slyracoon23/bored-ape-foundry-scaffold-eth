@@ -44,7 +44,7 @@ const Home: NextPage = () => {
             <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
               pathname:"/apes", 
               query: {
-                walletId: "0x942878558bC523777fE11e6d725AF93c86458050"
+                walletId: "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"
                 }
               }}>
                 Apes
@@ -54,7 +54,7 @@ const Home: NextPage = () => {
             <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
               pathname:"/kennel", 
               query: {
-                walletId: "0x599aa2feaeec1c4caa33da6b7fbd0e6578953c96"
+                walletId: "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"
                 }
               }}>
                 Kennel Club
