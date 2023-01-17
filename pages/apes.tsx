@@ -62,7 +62,6 @@ const Apes: NextPage = () => {
                                   ${nft['name']}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted text-truncate">${nft['description']}</small>
                                 </div>                            
                             </div>
                         </div>
@@ -72,6 +71,7 @@ const Apes: NextPage = () => {
       })
     })
 
+    // <small class="text-muted text-truncate">${nft['description']}</small>
 
   return (
     <section className="text-black dark:text-white dark:bg-black min-h-screen max-h-screen flex flex-col overflow-hidden selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
