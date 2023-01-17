@@ -9,7 +9,8 @@ import { useToggle } from "hooks";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
-import Link from 'next/link'
+import Link from 'next/link';
+import apeImage from 'public/icon.png'
 
 const Home: NextPage = () => {
   const [activeContract, setActiveContract] = useState<Address>(AddressZero);
@@ -21,7 +22,7 @@ const Home: NextPage = () => {
   return (
     <section className="text-black dark:text-white dark:bg-black min-h-screen max-h-screen flex flex-col overflow-hidden selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Head>
-        <title>Blacksmith</title>
+        <title>ApeMatcher</title>
         <link rel="icon" href="/favicon.ico" />
         <meta
           name="description"
@@ -34,35 +35,49 @@ const Home: NextPage = () => {
         walletButtonText={walletButtonText}
       />
       <main className="bg-white dark:bg-black flex flex-col md:flex-row flex-grow overflow-y-auto overscroll-none">
-        
+
         <section className="flex flex-col flex-grow bg-white dark:bg-black p-2 overflow-y-auto md:overscroll-none text-center">
           <h2 className="font-bold ">Select Which Contract</h2>
-          <div className="my-3">
-            
+          <div className ='my-3'>
+          <div className="col mx-2 my-3">
+            <div className ="card shadow-sm">
+
             {/* <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href="/apes">Apes
             </Link> */}
             <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
-              pathname:"/apes", 
+              pathname: "/apes",
               query: {
-                walletId: "0x942878558bC523777fE11e6d725AF93c86458050"
-                }
-              }}>
-                Apes
+                walletId: "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"
+              }
+              
+            }}>
+              Apes
+
             </Link>
+
+            </div>
+            </div>
+
+            <div className="col mx-2 my-3">
+
+           <div className ="card shadow-sm">
+
             {/* <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href="/kennel">Kennel Club
             </Link> */}
             <Link className="border border-black dark:border-white mx-2 px-2 py-0.5 focus:italic focus:outline-none" href={{
-              pathname:"/kennel", 
+              pathname: "/kennel",
               query: {
                 walletId: "0x599aa2feaeec1c4caa33da6b7fbd0e6578953c96"
-                }
-              }}>
-                Kennel Club
+              }
+            }}>
+              Kennel Club
             </Link>
 
           </div>
-          
-          
+          </div>
+          </div>
+
+
 
         </section>
         <Wallet open={isWalletOpen} />
