@@ -23,7 +23,7 @@ const Apes: NextPage = () => {
   const [activeContract, setActiveContract] = useState<Address>(AddressZero);
   const { state: isWalletOpen, toggle: toggleWallet } = useToggle(false);
   const walletButtonText = isWalletOpen ? "close wallet" : "open wallet";
-  const contract_address = ["0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D", "0xDBfD76AF2157Dc15eE4e57F3f942bB45Ba84aF24"]
+  const contract_address = ["0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D", "0x60E4d786628Fea6478F785A6d7e704777c86a7c6"]
   //console.log(contract_address)
   const resetActiveContract = () => setActiveContract(AddressZero);
   const [selected, setSelected] = useState(false);// Added state
@@ -140,7 +140,7 @@ const Apes: NextPage = () => {
         walletButtonText={walletButtonText}
       />
       <main className="bg-white dark:bg-black flex flex-col md:flex-row flex-grow overflow-y-auto overscroll-none">
-        <section className="flex flex-col justify-content-center flex-grow bg-white dark:bg-black p-2 overflow-y-auto md:overscroll-none text-center">
+        <section id="display-center" className="flex flex-col justify-content-center flex-grow bg-white dark:bg-black p-2 overflow-y-auto md:overscroll-none text-center">
           <h2 className="font-bold ">Select Your Apes</h2>
           <div id="result_nfts" className="flex flex-row flex-wrap">
             {items}

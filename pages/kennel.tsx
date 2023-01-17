@@ -21,7 +21,7 @@ const Kennel: NextPage = () => {
   const [activeContract, setActiveContract] = useState<Address>(AddressZero);
   const { state: isWalletOpen, toggle: toggleWallet } = useToggle(false);
   const walletButtonText = isWalletOpen ? "close wallet" : "open wallet";
-  const contract_address = ["0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D"]
+  const contract_address = ["0xba30E5F9Bb24caa003E9f2f0497Ad287FDF95623"]
   //console.log(contract_address)
   //const [data, setData] = useState([]);
   const [kcData, setKcData] = useState([]);
@@ -116,7 +116,7 @@ const Kennel: NextPage = () => {
         walletButtonText={walletButtonText}
       />
       <main className="bg-white dark:bg-black flex flex-col md:flex-row flex-grow overflow-y-auto overscroll-none">
-        <section className="flex flex-col flex-grow bg-white dark:bg-black p-2 overflow-y-auto md:overscroll-none">
+        <section id="display-center" className="flex flex-col flex-grow bg-white dark:bg-black p-2 overflow-y-auto md:overscroll-none">
         <h2 className="font-bold text-center">Select Your Kennel</h2>
         <div id="result_nfts" className="flex flex-row flex-wrap">
           {items}
