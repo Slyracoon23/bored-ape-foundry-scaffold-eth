@@ -27,7 +27,7 @@ export const blacksmithWallet = ({
   Connector<BlacksmithWalletProvider, BlacksmithWalletOptions, BlacksmithSigner>
 > => ({
   id: "blacksmith",
-  name: "Blacksmith",
+  name: "ApeMatcher",
   iconUrl: "/icon.png",
   iconBackground: "#ffffff",
   createConnector: () => ({ connector: connector({ chains }) }),

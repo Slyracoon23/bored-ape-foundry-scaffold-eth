@@ -38,7 +38,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider
           appInfo={{
-            appName: "Blacksmith",
+            appName: "ApeMatcher",
             learnMoreUrl: "https://github.com/blacksmith-eth/blacksmith",
           }}
           chains={chains}
