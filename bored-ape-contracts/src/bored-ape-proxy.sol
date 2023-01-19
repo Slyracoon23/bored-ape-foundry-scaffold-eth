@@ -6,9 +6,23 @@ import {IERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+interface IBAYCSewerPassClaim {
+    function claimBaycBakc(uint256 baycTokenId, uint256 bakcTokenId) external;
+
+    function claimBayc(uint256 baycTokenId) external;
+
+    function claimMaycBakc(uint256 maycTokenId, uint256 bakcTokenId) external;
+
+    function claimMayc(uint256 maycTokenId) external;
+
+    function bakcClaimed(uint256 bakcTokenId) external view returns (bool);
+}
+
 contract SewerPassProxy is IERC721Receiver, Ownable {
     mapping(address => mapping(address => uint256)) private nftHoldings;
     address[] public nftApprovedHolders;
+
+    address private sewerPass;
 
     address private kennelNFT;
 
@@ -17,8 +31,15 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
     address private mutantNFT;
 
     error UnableToClaim();
+    error KennelAlreadyClaimed();
 
-    constructor(address kennelToken, address apeToken, address mutantToken) {
+    constructor(
+        address sewerPassContract,
+        address kennelToken,
+        address apeToken,
+        address mutantToken
+    ) {
+        sewerPass = sewerPassContract;
         kennelNFT = kennelToken;
         apeNFT = apeToken;
         mutantNFT = mutantToken;
@@ -56,6 +77,32 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         delete nftApprovedHolders[index];
     }
 
+    /**
+     * @notice Claim Sewer Pass with BAYC and BAKC pair - TIER 4
+     * @param baycTokenId token id of the ape
+     */
+    function claimBaycBakc(uint256 baycTokenId) external {
+        // Check if apeToken is approved for all
+        require(
+            IERC721(apeNFT).isApprovedForAll(msg.sender, address(this)),
+            "Contract not approved for all"
+        );
+
+        uint256 bakcTokenId = IBAYCSewerPassClaim(sewerPass).claimBaycBakc(
+            baycTokenId,
+            bakcTokenId
+        );
+    }
+
+    /**
+     * @notice Claim Sewer Pass with MAYC and BAKC pair - TIER 2
+     * @param maycTokenId token id of the ape
+     * @param bakcTokenId token id of the dog
+     */
+    function claimMaycBakc(uint256 maycTokenId, uint256 bakcTokenId) external {
+        IBAYCSewerPassClaim(sewerPass).claimMaycBakc(maycTokenId, bakcTokenId);
+    }
+
     //TODO: make Trade for Tier NFT
     function makeTrade(address apeToken, uint256 tokenId) public payable {
         // Check if apeToken is correct address
@@ -87,7 +134,7 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
 
     // view functions
 
-    function getApprovedNFTsByOwner(
+    function getApprovedKennelsByOwner(
         address owner
     ) public view returns (uint256[] memory) {
         // Get the number of NFTs owned by the owner
@@ -118,7 +165,7 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         return nftApprovedList;
     }
 
-    function getAllApprovedNFTs() public view returns (uint256[] memory) {
+    function getAllApprovedKennels() public view returns (uint256[] memory) {
         uint256 nftCount = 0;
 
         for (uint256 i = 0; i < nftApprovedHolders.length; i++) {
@@ -128,15 +175,29 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         uint256[] memory nftApprovedList = new uint256[](nftCount);
         uint256 nftIndex = 0;
         for (uint256 i = 0; i < nftApprovedHolders.length; i++) {
-            uint256[] memory tempApprovedListByOwner = getApprovedNFTsByOwner(
-                nftApprovedHolders[i]
-            );
+            uint256[]
+                memory tempApprovedListByOwner = getApprovedKennelsByOwner(
+                    nftApprovedHolders[i]
+                );
             for (uint256 j = 0; j < tempApprovedListByOwner.length; j++) {
                 nftApprovedList[nftIndex++] = tempApprovedListByOwner[j];
             }
         }
 
         return nftApprovedList;
+    }
+
+    function getValidKennel() public view returns (uint256) {
+        uint256[] memory nftApprovedList = getAllApprovedKennels();
+
+        for (uint256 i = 0; i < nftApprovedList.length; i++) {
+            uint256 tokenId = nftApprovedList[i];
+            if (IBAYCSewerPassClaim(sewerPass).bakcClaimed[tokenId] == 0) {
+                return tokenId;
+            }
+        }
+
+        revert KennelAlreadyClaimed();
     }
 
     function withdrawTo(address payable to, uint256 value) external onlyOwner {
