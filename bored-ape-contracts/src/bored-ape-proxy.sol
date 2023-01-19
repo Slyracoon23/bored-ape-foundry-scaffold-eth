@@ -23,7 +23,6 @@ interface IBAYCSewerPass {
 }
 
 contract SewerPassProxy is IERC721Receiver, Ownable {
-    mapping(address => mapping(address => uint256)) private nftHoldings;
     address[] public nftApprovedHolders;
 
     address private sewerPassClaim;
@@ -37,7 +36,7 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
     address private mutantNFT;
 
     error UnableToClaim();
-    error KennelAlreadyClaimed();
+    error KennelAllClaimed();
 
     uint256 constant PATS_FAIR_PRICE = 1 ether;
 
@@ -57,25 +56,10 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         mutantNFT = mutantToken;
     }
 
-    // function withdrawlNFT(address token, uint256 tokenId) public {
-    //     require(
-    //         nftHoldings[msg.sender][address(token)] == tokenId,
-    //         "NFT not found in escrow"
-    //     );
+    function withdrawlNFT(address token, uint256 tokenId) external onlyOwner {
+        IERC721(token).safeTransferFrom(address(this), owner(), tokenId);
+    }
 
-    //     IERC721(token).safeTransferFrom(address(this), msg.sender, tokenId);
-
-    //     delete nftHoldings[msg.sender][address(token)];
-    // }
-
-    // // Remember to first approve the contract to transfer the NFT
-    // function depositNFT(address token, uint256 tokenId) public {
-    //     // FIX ME: Send from the token owner approved address
-    //     IERC721(token).safeTransferFrom(msg.sender, address(this), tokenId);
-    //     nftHoldings[msg.sender][address(token)] = tokenId;
-    // }
-
-    // add address to list of approved holders
     function addApprovedHolder(address owner) public {
         require(
             IERC721(kennelNFT).isApprovedForAll(owner, address(this)),
@@ -85,7 +69,7 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         nftApprovedHolders.push(owner);
     }
 
-    function removeApprovedHolder(uint index) external onlyOwner {
+    function removeApprovedHolder(uint64 index) external onlyOwner {
         delete nftApprovedHolders[index];
     }
 
@@ -235,35 +219,6 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         );
     }
 
-    // //TODO: make Trade for Tier NFT
-    // function makeTrade(address apeToken, uint256 tokenId) public payable {
-    //     // Check if apeToken is correct address
-    //     require(apeToken == apeNFT || apeToken == mutantNFT, "Invalid Token");
-
-    //     // Check if apeToken is approved for all
-    //     require(
-    //         IERC721(apeToken).isApprovedForAll(msg.sender, address(this)),
-    //         "Contract not approved for all"
-    //     );
-
-    //     // Check deposit fee is paid
-    //     require(msg.value == 0.1 ether, "Fee not paid");
-
-    //     // TODO: Check if apeToken is unused
-
-    //     // TODO: Get unused kennel token
-
-    //     // Do trade
-    //     bool success = true;
-
-    //     // check if success otherwise revert
-    //     if (!success) revert UnableToClaim();
-
-    //     // Transfer ERC1155 NFT to Ape owner
-
-    //     // Transfer Some ETH to Kennel NFT owner
-    // }
-
     // view functions
 
     function getApprovedKennelsByOwner(
@@ -332,7 +287,7 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
             }
         }
 
-        revert KennelAlreadyClaimed();
+        revert KennelAllClaimed();
     }
 
     function withdrawTo(address payable to, uint256 value) external onlyOwner {
