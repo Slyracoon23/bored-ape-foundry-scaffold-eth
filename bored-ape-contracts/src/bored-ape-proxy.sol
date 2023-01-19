@@ -48,9 +48,9 @@ contract SewerPassProxy is
     error UnableToClaim();
     error KennelAllClaimed();
 
-    uint256 constant PATS_FAIR_PRICE = 1 ether;
+    uint256 public constant PATS_FAIR_PRICE = 1 ether;
 
-    uint256 constant PATS_FAIR_PERCENTAGE = 10;
+    uint256 public constant PATS_FAIR_PERCENTAGE = 10;
 
     function initialize(
         address sewerPassClaimContract,
