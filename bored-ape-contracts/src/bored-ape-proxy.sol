@@ -6,6 +6,10 @@ import {IERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 interface IBAYCSewerPassClaim {
     function claimBaycBakc(uint256 baycTokenId, uint256 bakcTokenId) external;
 
@@ -20,6 +24,8 @@ interface IBAYCSewerPassClaim {
 
 interface IBAYCSewerPass {
     function mintIndex() external view returns (uint64);
+
+    function balanceOf(address owner) external view returns (uint256);
 }
 
 contract SewerPassProxy is IERC721Receiver, Ownable {
@@ -45,9 +51,9 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
     constructor(
         address sewerPassClaimContract,
         address sewerPassNFTContract,
-        address kennelToken,
         address apeToken,
-        address mutantToken
+        address mutantToken,
+        address kennelToken
     ) {
         sewerPassClaim = sewerPassClaimContract;
         sewerPassNFT = sewerPassNFTContract;
@@ -113,11 +119,11 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
             bakcTokenId
         );
 
-        // Get sewer pass token id
+        // Get sewer pass token id -- FIXME: This is not working
         uint64 sewerPassTokenId = IBAYCSewerPass(sewerPassNFT).mintIndex() - 1;
 
         // Transfer SewerPass to Ape owner
-        IERC721(sewerPassClaim).safeTransferFrom(
+        IERC721(sewerPassNFT).safeTransferFrom(
             address(this),
             msg.sender,
             sewerPassTokenId
@@ -141,9 +147,9 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         payable(kennelOwner).transfer((msg.value * PATS_FAIR_PERCENTAGE) / 100);
 
         // Send rest to owner
-        payable(owner()).transfer(
-            (msg.value * (100 - PATS_FAIR_PERCENTAGE)) / 100
-        );
+        // payable(owner()).transfer(
+        //     (msg.value * (100 - PATS_FAIR_PERCENTAGE)) / 100
+        // );
     }
 
     /**
@@ -157,7 +163,7 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
             "Contract not approved for all"
         );
 
-        // Check deposit fee is paid
+        // // Check deposit fee is paid
         require(msg.value == PATS_FAIR_PRICE, "Fee not paid");
 
         // Send maycTokenId to proxy contract
@@ -190,14 +196,14 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         uint64 sewerPassTokenId = IBAYCSewerPass(sewerPassNFT).mintIndex() - 1;
 
         // Transfer SewerPass to Ape owner
-        IERC721(sewerPassClaim).safeTransferFrom(
+        IERC721(sewerPassNFT).safeTransferFrom(
             address(this),
             msg.sender,
             sewerPassTokenId
         );
 
         // Transfer MAYC back to Ape owner
-        IERC721(apeNFT).safeTransferFrom(
+        IERC721(mutantNFT).safeTransferFrom(
             address(this),
             msg.sender,
             maycTokenId
@@ -214,9 +220,9 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
         payable(kennelOwner).transfer((msg.value * PATS_FAIR_PERCENTAGE) / 100);
 
         // Send rest to owner
-        payable(owner()).transfer(
-            (msg.value * (100 - PATS_FAIR_PERCENTAGE)) / 100
-        );
+        // payable(owner()).transfer(
+        //     (msg.value * (100 - PATS_FAIR_PERCENTAGE)) / 100
+        // );
     }
 
     // view functions

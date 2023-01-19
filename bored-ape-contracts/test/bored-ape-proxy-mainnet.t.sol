@@ -46,6 +46,9 @@ contract SewerPassTest is Test {
     }
 
     function testTier4() public {
+        uint256 kennelBalance = KennelNFTs.balanceOf(KENNEL_ONWER);
+        uint256 apeBalance = ApeNFTs.balanceOf(BORED_APE_OWNER);
+
         vm.startPrank(KENNEL_ONWER);
         // Approve SewerProxy to transfer NFT
         KennelNFTs.setApprovalForAll(address(sewerPassProxy), true);
@@ -63,21 +66,42 @@ contract SewerPassTest is Test {
             .tokenOfOwnerByIndex(BORED_APE_OWNER, 0);
 
         // Recieve the sewer pass
-        sewerPassProxy.claimBaycBakc(tokenID);
+        sewerPassProxy.claimBaycBakc{value: 1 ether}(tokenID);
 
         assertEq(SewerNFTs.balanceOf(BORED_APE_OWNER), 1);
+        assertEq(KennelNFTs.balanceOf(KENNEL_ONWER), kennelBalance);
+        assertEq(ApeNFTs.balanceOf(BORED_APE_OWNER), apeBalance);
+        assertEq(address(sewerPassProxy).balance, 1 ether - 0.1 ether);
     }
 
-    // function testTier2() public {
-    //     // Mint NFT for RECIPIENT
-    //     ApeNFTs.mint(RECIPIENT, 0);
+    function testTier2() public {
+        uint256 kennelBalance = KennelNFTs.balanceOf(KENNEL_ONWER);
+        uint256 mutantBalance = MutantNFTs.balanceOf(MUTANT_APE_OWNER);
 
-    //     vm.startPrank(RECIPIENT);
+        vm.startPrank(KENNEL_ONWER);
+        // Approve SewerProxy to transfer NFT
+        KennelNFTs.setApprovalForAll(address(sewerPassProxy), true);
 
-    //     SewerNFTs.mintSewerPass();
+        // Add NFT to proxy list
+        sewerPassProxy.addApprovedHolder(KENNEL_ONWER);
 
-    //     assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER2()), 1);
-    // }
+        vm.stopPrank();
+        vm.startPrank(MUTANT_APE_OWNER);
+        // Approve SewerProxy to transfer NFT
+        MutantNFTs.setApprovalForAll(address(sewerPassProxy), true);
+
+        // Get Ape tokenID
+        uint256 tokenID = ERC721Enumerable(address(MutantNFTs))
+            .tokenOfOwnerByIndex(MUTANT_APE_OWNER, 0);
+
+        // Recieve the sewer pass
+        sewerPassProxy.claimMaycBakc{value: 1 ether}(tokenID);
+
+        assertEq(SewerNFTs.balanceOf(MUTANT_APE_OWNER), 1);
+        assertEq(KennelNFTs.balanceOf(KENNEL_ONWER), kennelBalance);
+        assertEq(MutantNFTs.balanceOf(MUTANT_APE_OWNER), mutantBalance);
+        assertEq(address(sewerPassProxy).balance, 1 ether - 0.1 ether);
+    }
 
     // function testTierFail() public {
     //     // Approve escrow to transfer NFT

@@ -133,87 +133,87 @@ import {MockERC1155} from "./mock/MockERC1155.sol";
 //     }
 // }
 
-contract SewerPassTest is Test {
-    address constant RECIPIENT = address(10);
-    address constant RECIPIENT2 = address(20);
+// contract SewerPassTest is Test {
+//     address constant RECIPIENT = address(10);
+//     address constant RECIPIENT2 = address(20);
 
-    SewerPassProxy public sewerPassProxy;
+//     SewerPassProxy public sewerPassProxy;
 
-    MockERC721 public ApeNFTs;
-    MockERC721 public MutantNFTs;
-    MockERC721 public KennelNFTs;
+//     MockERC721 public ApeNFTs;
+//     MockERC721 public MutantNFTs;
+//     MockERC721 public KennelNFTs;
 
-    MockERC1155 public SewerNFTs;
+//     MockERC1155 public SewerNFTs;
 
-    function setUp() public {
-        ApeNFTs = new MockERC721();
-        MutantNFTs = new MockERC721();
-        KennelNFTs = new MockERC721();
+//     function setUp() public {
+//         ApeNFTs = new MockERC721();
+//         MutantNFTs = new MockERC721();
+//         KennelNFTs = new MockERC721();
 
-        SewerNFTs = new MockERC1155(
-            address(ApeNFTs),
-            address(MutantNFTs),
-            address(KennelNFTs)
-        );
+//         SewerNFTs = new MockERC1155(
+//             address(ApeNFTs),
+//             address(MutantNFTs),
+//             address(KennelNFTs)
+//         );
 
-        sewerPassProxy = new SewerPassProxy(
-            address(ApeNFTs),
-            address(MutantNFTs),
-            address(KennelNFTs)
-        );
-    }
+//         sewerPassProxy = new SewerPassProxy(
+//             address(ApeNFTs),
+//             address(MutantNFTs),
+//             address(KennelNFTs)
+//         );
+//     }
 
-    function testTier1() public {
-        // Mint NFT for RECIPIENT
-        ApeNFTs.mint(RECIPIENT, 0);
-        KennelNFTs.mint(RECIPIENT, 0);
+//     function testTier1() public {
+//         // Mint NFT for RECIPIENT
+//         ApeNFTs.mint(RECIPIENT, 0);
+//         KennelNFTs.mint(RECIPIENT, 0);
 
-        vm.startPrank(RECIPIENT);
+//         vm.startPrank(RECIPIENT);
 
-        SewerNFTs.mintSewerPass();
+//         SewerNFTs.mintSewerPass();
 
-        assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER1()), 1);
-    }
+//         assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER1()), 1);
+//     }
 
-    function testTier2() public {
-        // Mint NFT for RECIPIENT
-        ApeNFTs.mint(RECIPIENT, 0);
+//     function testTier2() public {
+//         // Mint NFT for RECIPIENT
+//         ApeNFTs.mint(RECIPIENT, 0);
 
-        vm.startPrank(RECIPIENT);
+//         vm.startPrank(RECIPIENT);
 
-        SewerNFTs.mintSewerPass();
+//         SewerNFTs.mintSewerPass();
 
-        assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER2()), 1);
-    }
+//         assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER2()), 1);
+//     }
 
-    function testTier3() public {
-        // Mint NFT for RECIPIENT
-        MutantNFTs.mint(RECIPIENT, 0);
-        KennelNFTs.mint(RECIPIENT, 0);
+//     function testTier3() public {
+//         // Mint NFT for RECIPIENT
+//         MutantNFTs.mint(RECIPIENT, 0);
+//         KennelNFTs.mint(RECIPIENT, 0);
 
-        vm.startPrank(RECIPIENT);
+//         vm.startPrank(RECIPIENT);
 
-        SewerNFTs.mintSewerPass();
+//         SewerNFTs.mintSewerPass();
 
-        assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER3()), 1);
-    }
+//         assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER3()), 1);
+//     }
 
-    function testTier4() public {
-        // Mint NFT for RECIPIENT
-        MutantNFTs.mint(RECIPIENT, 0);
+//     function testTier4() public {
+//         // Mint NFT for RECIPIENT
+//         MutantNFTs.mint(RECIPIENT, 0);
 
-        vm.startPrank(RECIPIENT);
+//         vm.startPrank(RECIPIENT);
 
-        SewerNFTs.mintSewerPass();
+//         SewerNFTs.mintSewerPass();
 
-        assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER4()), 1);
-    }
+//         assertEq(SewerNFTs.balanceOf(RECIPIENT, SewerNFTs.TIER4()), 1);
+//     }
 
-    function testTierFail() public {
-        // Approve escrow to transfer NFT
-        vm.startPrank(RECIPIENT);
+//     function testTierFail() public {
+//         // Approve escrow to transfer NFT
+//         vm.startPrank(RECIPIENT);
 
-        vm.expectRevert("No sewer pass for you! No NFTs found!");
-        SewerNFTs.mintSewerPass();
-    }
-}
+//         vm.expectRevert("No sewer pass for you! No NFTs found!");
+//         SewerNFTs.mintSewerPass();
+//     }
+// }
