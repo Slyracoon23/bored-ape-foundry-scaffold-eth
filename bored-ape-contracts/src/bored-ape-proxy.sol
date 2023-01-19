@@ -4,11 +4,10 @@ pragma solidity ^0.8.13;
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 interface IBAYCSewerPassClaim {
     function claimBaycBakc(uint256 baycTokenId, uint256 bakcTokenId) external;
@@ -28,7 +27,12 @@ interface IBAYCSewerPass {
     function balanceOf(address owner) external view returns (uint256);
 }
 
-contract SewerPassProxy is IERC721Receiver, Ownable {
+contract SewerPassProxy is
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable,
+    IERC721Receiver
+{
     address[] public nftApprovedHolders;
 
     address private sewerPassClaim;
