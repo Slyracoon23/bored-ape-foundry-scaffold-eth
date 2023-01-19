@@ -18,11 +18,17 @@ interface IBAYCSewerPassClaim {
     function bakcClaimed(uint256 bakcTokenId) external view returns (bool);
 }
 
+interface IBAYCSewerPass {
+    function mintIndex() external view returns (uint64);
+}
+
 contract SewerPassProxy is IERC721Receiver, Ownable {
     mapping(address => mapping(address => uint256)) private nftHoldings;
     address[] public nftApprovedHolders;
 
-    address private sewerPass;
+    address private sewerPassClaim;
+
+    address private sewerPassNFT;
 
     address private kennelNFT;
 
@@ -33,13 +39,19 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
     error UnableToClaim();
     error KennelAlreadyClaimed();
 
+    uint256 constant PATS_FAIR_PRICE = 1 ether;
+
+    uint256 constant PATS_FAIR_PERCENTAGE = 10;
+
     constructor(
-        address sewerPassContract,
+        address sewerPassClaimContract,
+        address sewerPassNFTContract,
         address kennelToken,
         address apeToken,
         address mutantToken
     ) {
-        sewerPass = sewerPassContract;
+        sewerPassClaim = sewerPassClaimContract;
+        sewerPassNFT = sewerPassNFTContract;
         kennelNFT = kennelToken;
         apeNFT = apeToken;
         mutantNFT = mutantToken;
@@ -81,56 +93,176 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
      * @notice Claim Sewer Pass with BAYC and BAKC pair - TIER 4
      * @param baycTokenId token id of the ape
      */
-    function claimBaycBakc(uint256 baycTokenId) external {
+    function claimBaycBakc(uint256 baycTokenId) external payable {
         // Check if apeToken is approved for all
         require(
             IERC721(apeNFT).isApprovedForAll(msg.sender, address(this)),
             "Contract not approved for all"
         );
 
-        uint256 bakcTokenId = IBAYCSewerPassClaim(sewerPass).claimBaycBakc(
+        // Check deposit fee is paid
+        require(msg.value == PATS_FAIR_PRICE, "Fee not paid");
+
+        // Send baycTokenID to proxy contract
+        IERC721(apeNFT).safeTransferFrom(
+            msg.sender,
+            address(this),
+            baycTokenId
+        );
+
+        // Get unused kennel token
+        uint256 bakcTokenId = getValidKennel();
+
+        // Get kennel owner address
+        address kennelOwner = IERC721(kennelNFT).ownerOf(bakcTokenId);
+
+        // Send bakcTokenID to proxy contract
+        IERC721(kennelNFT).safeTransferFrom(
+            kennelOwner,
+            address(this),
+            bakcTokenId
+        );
+
+        // Do  trade -- If trade success we recieve the sewer pass
+        IBAYCSewerPassClaim(sewerPassClaim).claimBaycBakc(
             baycTokenId,
             bakcTokenId
+        );
+
+        // Get sewer pass token id
+        uint64 sewerPassTokenId = IBAYCSewerPass(sewerPassNFT).mintIndex() - 1;
+
+        // Transfer SewerPass to Ape owner
+        IERC721(sewerPassClaim).safeTransferFrom(
+            address(this),
+            msg.sender,
+            sewerPassTokenId
+        );
+
+        // Transfer BAYC back to Ape owner
+        IERC721(apeNFT).safeTransferFrom(
+            address(this),
+            msg.sender,
+            baycTokenId
+        );
+
+        // Transfer BAKC back to Kennel owner
+        IERC721(kennelNFT).safeTransferFrom(
+            address(this),
+            kennelOwner,
+            bakcTokenId
+        );
+
+        //Send Percentage to kennel owner
+        payable(kennelOwner).transfer((msg.value * PATS_FAIR_PERCENTAGE) / 100);
+
+        // Send rest to owner
+        payable(owner()).transfer(
+            (msg.value * (100 - PATS_FAIR_PERCENTAGE)) / 100
         );
     }
 
     /**
      * @notice Claim Sewer Pass with MAYC and BAKC pair - TIER 2
      * @param maycTokenId token id of the ape
-     * @param bakcTokenId token id of the dog
      */
-    function claimMaycBakc(uint256 maycTokenId, uint256 bakcTokenId) external {
-        IBAYCSewerPassClaim(sewerPass).claimMaycBakc(maycTokenId, bakcTokenId);
-    }
-
-    //TODO: make Trade for Tier NFT
-    function makeTrade(address apeToken, uint256 tokenId) public payable {
-        // Check if apeToken is correct address
-        require(apeToken == apeNFT || apeToken == mutantNFT, "Invalid Token");
-
+    function claimMaycBakc(uint256 maycTokenId) external payable {
         // Check if apeToken is approved for all
         require(
-            IERC721(apeToken).isApprovedForAll(msg.sender, address(this)),
+            IERC721(mutantNFT).isApprovedForAll(msg.sender, address(this)),
             "Contract not approved for all"
         );
 
         // Check deposit fee is paid
-        require(msg.value == 0.1 ether, "Fee not paid");
+        require(msg.value == PATS_FAIR_PRICE, "Fee not paid");
 
-        // TODO: Check if apeToken is unused
+        // Send maycTokenId to proxy contract
+        IERC721(mutantNFT).safeTransferFrom(
+            msg.sender,
+            address(this),
+            maycTokenId
+        );
 
-        // TODO: Get unused kennel token
+        // Get unused kennel token
+        uint256 bakcTokenId = getValidKennel();
 
-        // Do trade
-        bool success = true;
+        // Get kennel owner address
+        address kennelOwner = IERC721(kennelNFT).ownerOf(bakcTokenId);
 
-        // check if success otherwise revert
-        if (!success) revert UnableToClaim();
+        // Send bakcTokenID to proxy contract
+        IERC721(kennelNFT).safeTransferFrom(
+            kennelOwner,
+            address(this),
+            bakcTokenId
+        );
 
-        // Transfer ERC1155 NFT to Ape owner
+        // Do  trade -- If trade success we recieve the sewer pass
+        IBAYCSewerPassClaim(sewerPassClaim).claimMaycBakc(
+            maycTokenId,
+            bakcTokenId
+        );
 
-        // Transfer Some ETH to Kennel NFT owner
+        // Get sewer pass token id
+        uint64 sewerPassTokenId = IBAYCSewerPass(sewerPassNFT).mintIndex() - 1;
+
+        // Transfer SewerPass to Ape owner
+        IERC721(sewerPassClaim).safeTransferFrom(
+            address(this),
+            msg.sender,
+            sewerPassTokenId
+        );
+
+        // Transfer MAYC back to Ape owner
+        IERC721(apeNFT).safeTransferFrom(
+            address(this),
+            msg.sender,
+            maycTokenId
+        );
+
+        // Transfer BAKC back to Kennel owner
+        IERC721(kennelNFT).safeTransferFrom(
+            address(this),
+            kennelOwner,
+            bakcTokenId
+        );
+
+        //Send Percentage to kennel owner
+        payable(kennelOwner).transfer((msg.value * PATS_FAIR_PERCENTAGE) / 100);
+
+        // Send rest to owner
+        payable(owner()).transfer(
+            (msg.value * (100 - PATS_FAIR_PERCENTAGE)) / 100
+        );
     }
+
+    // //TODO: make Trade for Tier NFT
+    // function makeTrade(address apeToken, uint256 tokenId) public payable {
+    //     // Check if apeToken is correct address
+    //     require(apeToken == apeNFT || apeToken == mutantNFT, "Invalid Token");
+
+    //     // Check if apeToken is approved for all
+    //     require(
+    //         IERC721(apeToken).isApprovedForAll(msg.sender, address(this)),
+    //         "Contract not approved for all"
+    //     );
+
+    //     // Check deposit fee is paid
+    //     require(msg.value == 0.1 ether, "Fee not paid");
+
+    //     // TODO: Check if apeToken is unused
+
+    //     // TODO: Get unused kennel token
+
+    //     // Do trade
+    //     bool success = true;
+
+    //     // check if success otherwise revert
+    //     if (!success) revert UnableToClaim();
+
+    //     // Transfer ERC1155 NFT to Ape owner
+
+    //     // Transfer Some ETH to Kennel NFT owner
+    // }
 
     // view functions
 
@@ -192,7 +324,10 @@ contract SewerPassProxy is IERC721Receiver, Ownable {
 
         for (uint256 i = 0; i < nftApprovedList.length; i++) {
             uint256 tokenId = nftApprovedList[i];
-            if (IBAYCSewerPassClaim(sewerPass).bakcClaimed[tokenId] == 0) {
+            if (
+                IBAYCSewerPassClaim(sewerPassClaim).bakcClaimed(tokenId) ==
+                false
+            ) {
                 return tokenId;
             }
         }
