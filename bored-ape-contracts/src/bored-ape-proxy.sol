@@ -52,19 +52,24 @@ contract SewerPassProxy is
 
     uint256 constant PATS_FAIR_PERCENTAGE = 10;
 
-    constructor(
+    function initialize(
         address sewerPassClaimContract,
         address sewerPassNFTContract,
         address apeToken,
         address mutantToken,
         address kennelToken
-    ) {
+    ) public initializer {
         sewerPassClaim = sewerPassClaimContract;
         sewerPassNFT = sewerPassNFTContract;
         kennelNFT = kennelToken;
         apeNFT = apeToken;
         mutantNFT = mutantToken;
+
+        __Ownable_init();
     }
+
+    ///@dev required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyOwner {}
 
     function withdrawlNFT(address token, uint256 tokenId) external onlyOwner {
         IERC721(token).safeTransferFrom(address(this), owner(), tokenId);

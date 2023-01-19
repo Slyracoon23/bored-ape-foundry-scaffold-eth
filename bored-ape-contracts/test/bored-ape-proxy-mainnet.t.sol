@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "../src/bored-ape-proxy.sol";
+import "../src/UpgradeUUPS.sol";
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {MockERC721} from "./mock/MockERC721.sol";
@@ -31,12 +32,22 @@ contract SewerPassTest is Test {
     IBAYCSewerPass constant SewerNFTs =
         IBAYCSewerPass(0x764AeebcF425d56800eF2c84F2578689415a2DAa);
 
-    SewerPassProxy sewerPassProxy;
+    SewerPassProxy implementationV1;
+    UUPSProxy proxy;
+    SewerPassProxy wrappedProxyV1;
 
     function setUp() public {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"), 16434998); // fork mainnet at block 16434998
 
-        sewerPassProxy = new SewerPassProxy(
+        implementationV1 = new SewerPassProxy();
+        // deploy proxy contract and point it to implementation
+
+        proxy = new UUPSProxy(address(implementationV1), "");
+
+        // wrap in ABI to support easier calls
+        wrappedProxyV1 = SewerPassProxy(address(proxy));
+
+        wrappedProxyV1.initialize(
             address(SewerPassClaim),
             address(SewerNFTs),
             address(ApeNFTs),
@@ -51,27 +62,27 @@ contract SewerPassTest is Test {
 
         vm.startPrank(KENNEL_ONWER);
         // Approve SewerProxy to transfer NFT
-        KennelNFTs.setApprovalForAll(address(sewerPassProxy), true);
+        KennelNFTs.setApprovalForAll(address(wrappedProxyV1), true);
 
         // Add NFT to proxy list
-        sewerPassProxy.addApprovedHolder(KENNEL_ONWER);
+        wrappedProxyV1.addApprovedHolder(KENNEL_ONWER);
 
         vm.stopPrank();
         vm.startPrank(BORED_APE_OWNER);
         // Approve SewerProxy to transfer NFT
-        ApeNFTs.setApprovalForAll(address(sewerPassProxy), true);
+        ApeNFTs.setApprovalForAll(address(wrappedProxyV1), true);
 
         // Get Ape tokenID
         uint256 tokenID = ERC721Enumerable(address(ApeNFTs))
             .tokenOfOwnerByIndex(BORED_APE_OWNER, 0);
 
         // Recieve the sewer pass
-        sewerPassProxy.claimBaycBakc{value: 1 ether}(tokenID);
+        wrappedProxyV1.claimBaycBakc{value: 1 ether}(tokenID);
 
         assertEq(SewerNFTs.balanceOf(BORED_APE_OWNER), 1);
         assertEq(KennelNFTs.balanceOf(KENNEL_ONWER), kennelBalance);
         assertEq(ApeNFTs.balanceOf(BORED_APE_OWNER), apeBalance);
-        assertEq(address(sewerPassProxy).balance, 1 ether - 0.1 ether);
+        assertEq(address(wrappedProxyV1).balance, 1 ether - 0.1 ether);
     }
 
     function testTier2() public {
@@ -80,27 +91,27 @@ contract SewerPassTest is Test {
 
         vm.startPrank(KENNEL_ONWER);
         // Approve SewerProxy to transfer NFT
-        KennelNFTs.setApprovalForAll(address(sewerPassProxy), true);
+        KennelNFTs.setApprovalForAll(address(wrappedProxyV1), true);
 
         // Add NFT to proxy list
-        sewerPassProxy.addApprovedHolder(KENNEL_ONWER);
+        wrappedProxyV1.addApprovedHolder(KENNEL_ONWER);
 
         vm.stopPrank();
         vm.startPrank(MUTANT_APE_OWNER);
         // Approve SewerProxy to transfer NFT
-        MutantNFTs.setApprovalForAll(address(sewerPassProxy), true);
+        MutantNFTs.setApprovalForAll(address(wrappedProxyV1), true);
 
         // Get Ape tokenID
         uint256 tokenID = ERC721Enumerable(address(MutantNFTs))
             .tokenOfOwnerByIndex(MUTANT_APE_OWNER, 0);
 
         // Recieve the sewer pass
-        sewerPassProxy.claimMaycBakc{value: 1 ether}(tokenID);
+        wrappedProxyV1.claimMaycBakc{value: 1 ether}(tokenID);
 
         assertEq(SewerNFTs.balanceOf(MUTANT_APE_OWNER), 1);
         assertEq(KennelNFTs.balanceOf(KENNEL_ONWER), kennelBalance);
         assertEq(MutantNFTs.balanceOf(MUTANT_APE_OWNER), mutantBalance);
-        assertEq(address(sewerPassProxy).balance, 1 ether - 0.1 ether);
+        assertEq(address(wrappedProxyV1).balance, 1 ether - 0.1 ether);
     }
 
     // function testTierFail() public {
