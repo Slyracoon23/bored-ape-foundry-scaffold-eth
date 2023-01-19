@@ -23,7 +23,7 @@ contract SewerPassTest is Test {
     ERC721 constant MutantNFTs =
         ERC721(0x60E4d786628Fea6478F785A6d7e704777c86a7c6);
     ERC721 constant KennelNFTs =
-        ERC721(0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984);
+        ERC721(0xba30E5F9Bb24caa003E9f2f0497Ad287FDF95623);
 
     IBAYCSewerPassClaim constant SewerPassClaim =
         IBAYCSewerPassClaim(0xBA5a9E9CBCE12c70224446C24C111132BECf9F1d);
@@ -34,7 +34,7 @@ contract SewerPassTest is Test {
     SewerPassProxy sewerPassProxy;
 
     function setUp() public {
-        //vm.createSelectFork(vm.envString("MAINNET_RPC_URL"), 16434998); // fork mainnet at block 16434998
+        vm.createSelectFork(vm.envString("MAINNET_RPC_URL"), 16434998); // fork mainnet at block 16434998
 
         sewerPassProxy = new SewerPassProxy(
             address(SewerPassClaim),
@@ -53,6 +53,7 @@ contract SewerPassTest is Test {
         // Add NFT to proxy list
         sewerPassProxy.addApprovedHolder(KENNEL_ONWER);
 
+        vm.stopPrank();
         vm.startPrank(BORED_APE_OWNER);
         // Approve SewerProxy to transfer NFT
         ApeNFTs.setApprovalForAll(address(sewerPassProxy), true);
